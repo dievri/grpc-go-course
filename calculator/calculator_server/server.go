@@ -13,7 +13,7 @@ import (
 type server struct{}
 
 func (*server) Sum(ctx context.Context, req *calculatorpb.SumRequest) (*calculatorpb.SumResponse, error) {
-	fmt.Printf("Received Sum RPC: %v", req)
+	fmt.Printf("Received Sum RPC: %v\n", req)
 	firstNumber := req.FirstNumber
 	secondNumber := req.SecondNumber
 	sum := firstNumber + secondNumber
@@ -26,8 +26,8 @@ func (*server) Sum(ctx context.Context, req *calculatorpb.SumRequest) (*calculat
 }
 
 func main() {
-	fmt.Print("Hello from calculator server!")
-	lis, err := net.Listen("tcp", "0.0.0.O:50051")
+	fmt.Print("Hello from calculator server!\n")
+	lis, err := net.Listen("tcp", "localhost:50051")
 	if err != nil {
 		log.Fatalf("Failed to listen: %v", err)
 	}
