@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"io"
 	"log"
 
 	"github.com/dievri/grpc-go-course/calculator/calculatorpb"
@@ -16,8 +17,9 @@ func main() {
 		log.Fatalf("Could not connect to server: %v", err)
 	}
 	defer cc.Close()
-	doSum(cc)
-
+	// doSum(cc)
+	c := calculatorpb.NewCalculatorServiceClient(cc)
+	doServerStreaming(c)
 }
 
 func doSum(cc *grpc.ClientConn) {
@@ -32,4 +34,25 @@ func doSum(cc *grpc.ClientConn) {
 	}
 
 	fmt.Println(res.GetSumResult())
+}
+
+func doServerStreaming(c calculatorpb.CalculatorServiceClient) {
+	fmt.Println("Starting to do a PrimeDecompoisition Server Streaming RPC ...!")
+	req := &calculatorpb.PrimeNumberDecompositionRequest{
+		Number: 123634634,
+	}
+	stream, err := c.PrimeNumberDecomposition(context.Background(), req)
+	if err != nil {
+		log.Fatalf("Error while calling PrimeDecomposition RPC: %v", err)
+	}
+	for {
+		res, err := stream.Recv()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			log.Fatalf("Something happend: %v", err)
+		}
+		fmt.Printf("Prime factor is: %v\n", res.GetPrimeFactor())
+	}
 }
